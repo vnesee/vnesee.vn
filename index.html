@@ -4,19 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Phong Phu — Profile</title>
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    /* ════════════════════════════════════════════
-       RESET & BASE
-       — user-select: none chặn bôi chọn toàn trang
-       — tap-highlight: transparent xóa nền xanh khi chạm mobile
-    ════════════════════════════════════════════ */
     *, *::before, *::after {
-      margin: 0; padding: 0; box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
       user-select: none;
       -webkit-user-select: none;
       -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
     }
 
     body {
@@ -29,9 +26,6 @@
       color: #fff;
     }
 
-    /* ════════════════════════════════════════════
-       BACKGROUND GIF
-    ════════════════════════════════════════════ */
     .bg-wrap {
       position: fixed;
       inset: 0;
@@ -54,14 +48,11 @@
     .bg-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.22);
+      background: rgba(0,0,0,0.22);
       z-index: 1;
       pointer-events: none;
     }
 
-    /* ════════════════════════════════════════════
-       LAYOUT WRAPPER
-    ════════════════════════════════════════════ */
     .page {
       position: relative;
       z-index: 10;
@@ -74,20 +65,14 @@
       padding: 20px 16px;
     }
 
-    /* ════════════════════════════════════════════
-       GLASS
-    ════════════════════════════════════════════ */
     .glass {
-      background: rgba(255, 255, 255, 0.07);
+      background: rgba(255,255,255,0.07);
       backdrop-filter: blur(16px) saturate(1.3);
       -webkit-backdrop-filter: blur(16px) saturate(1.3);
-      border: 1px solid rgba(255, 255, 255, 0.13);
+      border: 1px solid rgba(255,255,255,0.13);
       border-radius: 22px;
     }
 
-    /* ════════════════════════════════════════════
-       PROFILE CARD
-    ════════════════════════════════════════════ */
     .profile-card {
       width: 100%;
       padding: 22px 22px 20px;
@@ -98,12 +83,12 @@
       position: absolute;
       top: 15px;
       right: 16px;
-      background: rgba(255, 255, 255, 0.09);
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255,255,255,0.09);
+      border: 1px solid rgba(255,255,255,0.18);
       border-radius: 99px;
       padding: 4px 12px 4px 9px;
       font-size: 11.5px;
-      color: rgba(255, 255, 255, 0.7);
+      color: rgba(255,255,255,0.7);
       display: flex;
       align-items: center;
       gap: 5px;
@@ -126,8 +111,9 @@
       height: 70px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2.5px solid rgba(255, 255, 255, 0.32);
+      border: 2.5px solid rgba(255,255,255,0.32);
       display: block;
+      pointer-events: none;
     }
 
     .profile-meta { padding-top: 3px; }
@@ -141,7 +127,7 @@
 
     .profile-tag {
       font-size: 12.5px;
-      color: rgba(255, 255, 255, 0.55);
+      color: rgba(255,255,255,0.55);
       margin-top: 4px;
     }
 
@@ -150,7 +136,7 @@
       align-items: center;
       gap: 4px;
       font-size: 12.5px;
-      color: rgba(255, 255, 255, 0.55);
+      color: rgba(255,255,255,0.55);
       margin-top: 5px;
     }
     .profile-location i { font-size: 10px; }
@@ -158,18 +144,17 @@
     .divider {
       width: 100%;
       height: 1px;
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255,255,255,0.08);
       margin: 12px 0;
     }
 
     .profile-bio {
       font-size: 13.5px;
-      color: rgba(255, 255, 255, 0.70);
+      color: rgba(255,255,255,0.70);
       line-height: 1.6;
       margin-bottom: 16px;
     }
 
-    /* ── Social Icons ── */
     .social-row {
       display: flex;
       gap: 9px;
@@ -180,39 +165,36 @@
       width: 37px;
       height: 37px;
       border-radius: 12px;
-      background: rgba(255, 255, 255, 0.09);
-      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255,255,255,0.09);
+      border: 1px solid rgba(255,255,255,0.14);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: rgba(255, 255, 255, 0.82);
+      color: rgba(255,255,255,0.82);
       font-size: 15px;
       text-decoration: none;
       cursor: pointer;
-      /* FIX: chỉ transition transform/bg/shadow — KHÔNG dùng :hover để tránh sticky trên mobile */
       transition:
-        transform   0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
-        background  0.2s ease,
-        color       0.2s ease,
-        box-shadow  0.2s ease;
+        transform 0.28s cubic-bezier(0.34,1.56,0.64,1),
+        background 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease;
     }
 
-    /* FIX: hover chỉ chạy trên thiết bị có chuột thật (desktop) */
     @media (hover: hover) {
       .social-btn:hover {
         transform: translateY(-6px) scale(1.14);
-        background: rgba(255, 255, 255, 0.20);
+        background: rgba(255,255,255,0.20);
         color: #fff;
-        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.25);
       }
     }
 
-    /* Mobile: JS thêm/xóa class này thủ công → tự reset khi nhấc tay */
     .social-btn.touch-hover {
       transform: translateY(-6px) scale(1.14);
-      background: rgba(255, 255, 255, 0.20);
+      background: rgba(255,255,255,0.20);
       color: #fff;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
     }
 
     .social-btn:active {
@@ -220,9 +202,6 @@
       transition-duration: 0.1s !important;
     }
 
-    /* ════════════════════════════════════════════
-       MUSIC PLAYER
-    ════════════════════════════════════════════ */
     .music-player {
       width: 100%;
       padding: 14px 16px 13px;
@@ -244,8 +223,9 @@
       height: 44px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid rgba(255, 255, 255, 0.26);
+      border: 2px solid rgba(255,255,255,0.26);
       flex-shrink: 0;
+      pointer-events: none;
     }
     .album-art.playing {
       animation: spin 5s linear infinite;
@@ -257,6 +237,7 @@
     }
 
     .song-info { flex: 1; min-width: 0; }
+
     .song-title {
       font-size: 13.5px;
       font-weight: 600;
@@ -264,13 +245,13 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
     .song-artist {
       font-size: 11.5px;
-      color: rgba(255, 255, 255, 0.52);
+      color: rgba(255,255,255,0.52);
       margin-top: 2px;
     }
 
-    /* Controls */
     .controls {
       display: flex;
       align-items: center;
@@ -281,16 +262,14 @@
     .ctrl {
       background: none;
       border: none;
-      color: rgba(255, 255, 255, 0.78);
+      color: rgba(255,255,255,0.78);
       font-size: 17px;
       cursor: pointer;
-      /* FIX: padding lớn hơn để vùng chạm mobile dễ nhấn */
       padding: 8px 5px;
       line-height: 1;
       transition: transform 0.15s, color 0.15s;
     }
 
-    /* FIX: hover chỉ trên desktop */
     @media (hover: hover) {
       .ctrl:hover { color: #fff; transform: scale(1.18); }
     }
@@ -302,37 +281,28 @@
       gap: 4px;
     }
 
-    /* ════════════════════════════════════════════
-       FIX RANGE INPUT — vùng chạm lớn hơn, hình dáng không đổi
-       Kỹ thuật: height cao (24px) để dễ chạm, nhưng track thực tế
-       chỉ 3px qua ::webkit-slider-runnable-track
-    ════════════════════════════════════════════ */
     input[type=range] {
       -webkit-appearance: none;
       appearance: none;
-      /* FIX: transparent để track pseudo-element hiện đúng */
       background: transparent;
       border-radius: 99px;
-      /* FIX: 24px để ngón tay dễ chạm, track vẫn mỏng 3px */
       height: 24px;
       outline: none;
       cursor: pointer;
     }
 
-    /* Track thực tế — 3px như thiết kế gốc */
     input[type=range]::-webkit-slider-runnable-track {
       height: 3px;
-      background: rgba(255, 255, 255, 0.22);
+      background: rgba(255,255,255,0.22);
       border-radius: 99px;
     }
     input[type=range]::-moz-range-track {
       height: 3px;
-      background: rgba(255, 255, 255, 0.22);
+      background: rgba(255,255,255,0.22);
       border-radius: 99px;
       border: none;
     }
 
-    /* Thumb — (11px - 3px) / 2 = 4px để canh giữa track */
     input[type=range]::-webkit-slider-thumb {
       -webkit-appearance: none;
       width: 11px;
@@ -358,7 +328,6 @@
 
     #volSlider { width: 56px; }
 
-    /* Progress row */
     .progress-row {
       display: flex;
       align-items: center;
@@ -368,7 +337,7 @@
 
     .ts {
       font-size: 10.5px;
-      color: rgba(255, 255, 255, 0.52);
+      color: rgba(255,255,255,0.52);
       min-width: 30px;
       font-variant-numeric: tabular-nums;
     }
@@ -377,35 +346,29 @@
     .progress-track {
       flex: 1;
       height: 3px;
-      background: rgba(255, 255, 255, 0.16);
+      background: rgba(255,255,255,0.16);
       border-radius: 99px;
       cursor: pointer;
       position: relative;
-      /* FIX: transition ở base để animate khi thoát khỏi drag/hover */
       transition: transform 0.15s ease;
     }
 
-    /* FIX: vùng chạm mở rộng lên/xuống 12px, không đổi hình dáng */
     .progress-track::before {
       content: '';
       position: absolute;
       inset: -12px 0;
     }
 
-    /* FIX: hover chỉ trên desktop */
-    @media (hover: hover) {
-      .progress-track:hover { transform: scaleY(1.6); }
-      .progress-track:hover .progress-fill::after {
-        transform: translateY(-50%) scale(1.35) scaleY(calc(1 / 1.6));
-      }
-    }
-
-    /* Dragging: JS thêm class, transition: none để không giật */
+    .progress-track.hover  { transform: scaleY(1.6); }
     .progress-track.dragging { transform: scaleY(2); transition: none; }
+
+    .progress-track.hover .progress-fill::after {
+      transform: translateY(-50%) scale(1.35) scaleY(calc(1 / 1.6));
+    }
 
     .progress-fill {
       height: 3px;
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255,255,255,0.85);
       border-radius: 99px;
       width: 0%;
       position: relative;
@@ -414,7 +377,6 @@
     }
     .progress-track.dragging .progress-fill { transition: none; }
 
-    /* Scrubber dot */
     .progress-fill::after {
       content: '';
       position: absolute;
@@ -425,17 +387,13 @@
       border-radius: 50%;
       background: #fff;
       box-shadow: 0 0 5px rgba(0,0,0,0.4);
-      opacity: 1;
-      transition: transform 0.15s;
       transform: translateY(-50%);
+      transition: transform 0.15s;
     }
     .progress-track.dragging .progress-fill::after {
       transform: translateY(-50%) scale(1.35) scaleY(0.5);
     }
 
-    /* ════════════════════════════════════════════
-       SPLASH SCREEN
-    ════════════════════════════════════════════ */
     #splash {
       position: fixed;
       inset: 0;
@@ -455,7 +413,7 @@
 
     @keyframes halo-breathe {
       0%, 100% { opacity: 0.58; filter: blur(1.2px); transform: scale(0.978); }
-      50%       { opacity: 1;    filter: blur(0px);   transform: scale(1);     }
+      50%       { opacity: 1;   filter: blur(0px);   transform: scale(1); }
     }
 
     .splash-title {
@@ -477,36 +435,30 @@
 </head>
 <body>
 
-  <!-- SPLASH -->
   <div id="splash">
     <div class="splash-title">Halo</div>
     <div class="splash-sub">Tap to enter</div>
   </div>
 
-  <!-- BACKGROUND -->
   <div class="bg-wrap">
-    <img id="bg" src="bg.gif" alt="">
+    <img id="bg" src="bg.gif" alt="" draggable="false">
   </div>
   <div class="bg-overlay"></div>
 
-  <!-- AUDIO -->
   <audio id="music" loop preload="auto">
     <source src="music.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- CONTENT -->
   <main class="page">
 
-    <!-- Profile Card -->
     <div class="glass profile-card">
       <div class="view-counter">
         <i class="fas fa-eye"></i>
         <span id="viewCount">512</span>
       </div>
-
       <div class="profile-header">
         <div class="avatar-wrap">
-          <img class="avatar" src="avatar.png" alt="avatar">
+          <img class="avatar" src="avatar.png" alt="avatar" draggable="false">
         </div>
         <div class="profile-meta">
           <div class="profile-name">Phong Phu</div>
@@ -517,71 +469,37 @@
           </div>
         </div>
       </div>
-
       <div class="divider"></div>
-
       <div class="profile-bio">Nothin' to see here</div>
-
-      <!-- FIX: href trực tiếp + target="_blank" → mở tab mới, trang cũ vẫn còn -->
       <div class="social-row">
-        <a class="social-btn"
-           href="https://github.com/vnesee"
-           target="_blank" rel="noopener noreferrer" title="GitHub">
-          <i class="fab fa-github"></i>
-        </a>
-        <a class="social-btn"
-           href="https://facebook.com/quachphongphu2009"
-           target="_blank" rel="noopener noreferrer" title="Facebook">
-          <i class="fab fa-facebook-f"></i>
-        </a>
-        <a class="social-btn"
-           href="https://tiktok.com/@_di4c"
-           target="_blank" rel="noopener noreferrer" title="TikTok">
-          <i class="fab fa-tiktok"></i>
-        </a>
-        <a class="social-btn"
-           href="https://instagram.com/rpt.mckeyyyyy"
-           target="_blank" rel="noopener noreferrer" title="Instagram">
-          <i class="fab fa-instagram"></i>
-        </a>
-        <a class="social-btn"
-           href="https://discord.gg/invite/vnpvp-asia-trai-khi-1061493608571736074"
-           target="_blank" rel="noopener noreferrer" title="Discord">
-          <i class="fab fa-discord"></i>
-        </a>
-        <a class="social-btn"
-           href="https://open.spotify.com/artist/5dfZ5uSmzR7VQK0udbAVpf"
-           target="_blank" rel="noopener noreferrer" title="Spotify">
-          <i class="fab fa-spotify"></i>
-        </a>
+        <a class="social-btn" href="https://github.com/vnesee" title="GitHub"><i class="fab fa-github"></i></a>
+        <a class="social-btn" href="https://facebook.com/quachphongphu2009" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a class="social-btn" href="https://tiktok.com/@_di4c" title="TikTok"><i class="fab fa-tiktok"></i></a>
+        <a class="social-btn" href="https://instagram.com/rpt.mckeyyyyy" title="Instagram"><i class="fab fa-instagram"></i></a>
+        <a class="social-btn" href="https://discord.gg/invite/vnpvp-asia-trai-khi-1061493608571736074" title="Discord"><i class="fab fa-discord"></i></a>
+        <a class="social-btn" href="https://open.spotify.com/artist/5dfZ5uSmzR7VQK0udbAVpf" title="Spotify"><i class="fab fa-spotify"></i></a>
       </div>
     </div>
 
-    <!-- Music Player -->
     <div class="glass music-player">
       <div class="player-top">
-        <img class="album-art" id="albumArt" src="album.png" alt="album">
+        <img class="album-art" id="albumArt" src="album.png" alt="album" draggable="false">
         <div class="song-info">
           <div class="song-title">tosop - ft. vnesee</div>
           <div class="song-artist">glass animal</div>
         </div>
         <div class="controls">
           <div class="vol-wrap">
-            <button class="ctrl" id="muteBtn" title="Tắt / Bật tiếng">
-              <i class="fas fa-volume-high" id="volIcon"></i>
-            </button>
+            <button class="ctrl" id="muteBtn"><i class="fas fa-volume-high" id="volIcon"></i></button>
             <input type="range" id="volSlider" min="0" max="100" value="80">
           </div>
-          <button class="ctrl" id="playBtn" title="Phát / Dừng">
-            <i class="fas fa-play" id="playIcon"></i>
-          </button>
+          <button class="ctrl" id="playBtn"><i class="fas fa-play" id="playIcon"></i></button>
         </div>
       </div>
-
       <div class="progress-row">
-        <span class="ts"     id="tCur">0:00</span>
+        <span class="ts" id="tCur">0:00</span>
         <div class="progress-track" id="pTrack">
-          <div class="progress-fill"  id="pFill"></div>
+          <div class="progress-fill" id="pFill"></div>
         </div>
         <span class="ts end" id="tTot">5:20</span>
       </div>
@@ -590,260 +508,246 @@
   </main>
 
   <script>
-  /* ════════════════════════════════════════════════════════
-     PROTECTION — chặn F12, chuột phải, sao chép, kéo thả
-  ════════════════════════════════════════════════════════ */
-  document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+      if (e.key === 'F12') { e.preventDefault(); return; }
+      const k = e.key.toLowerCase();
+      if (e.ctrlKey || e.metaKey) {
+        if (e.shiftKey && ['i','j','c','k'].includes(k)) { e.preventDefault(); return; }
+        if (['u','s','a','c','x','p'].includes(k)) { e.preventDefault(); return; }
+      }
+    });
+    document.addEventListener('selectstart', e => e.preventDefault());
+    document.addEventListener('copy',      e => e.preventDefault());
+    document.addEventListener('cut',       e => e.preventDefault());
+    document.addEventListener('dragstart', e => e.preventDefault());
 
-  document.addEventListener('keydown', e => {
-    if (e.key === 'F12') { e.preventDefault(); return; }
-    const k = e.key.toLowerCase();
-    if (e.ctrlKey || e.metaKey) {
-      // Ctrl+Shift+I/J/C/K → DevTools
-      if (e.shiftKey && ['i','j','c','k'].includes(k)) { e.preventDefault(); return; }
-      // Ctrl+U (nguồn), Ctrl+S (lưu), Ctrl+A (chọn tất), Ctrl+C (copy), Ctrl+X (cắt), Ctrl+P (in)
-      if (['u','s','a','c','x','p'].includes(k)) { e.preventDefault(); return; }
+    (function () {
+      const KEY = 'profile_views_v1';
+      let n = parseInt(localStorage.getItem(KEY) || '512', 10);
+      n += 1;
+      localStorage.setItem(KEY, n);
+      document.getElementById('viewCount').textContent = n.toLocaleString('vi-VN');
+    })();
+
+    const audio     = document.getElementById('music');
+    const albumArt  = document.getElementById('albumArt');
+    const playBtn   = document.getElementById('playBtn');
+    const playIcon  = document.getElementById('playIcon');
+    const muteBtn   = document.getElementById('muteBtn');
+    const volIcon   = document.getElementById('volIcon');
+    const volSlider = document.getElementById('volSlider');
+    const pFill     = document.getElementById('pFill');
+    const pTrack    = document.getElementById('pTrack');
+    const tCur      = document.getElementById('tCur');
+    const tTot      = document.getElementById('tTot');
+
+    let playing = false;
+    audio.volume = 0.8;
+
+    function fmt(s) {
+      if (!s || isNaN(s)) return '0:00';
+      return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
     }
-  });
 
-  document.addEventListener('selectstart', e => e.preventDefault());
-  document.addEventListener('copy',  e => e.preventDefault());
-  document.addEventListener('cut',   e => e.preventDefault());
-  document.addEventListener('dragstart', e => e.preventDefault());
-
-
-  /* ════════════════════════════════════════════════════════
-     1. VIEW COUNTER
-  ════════════════════════════════════════════════════════ */
-  (function () {
-    const KEY  = 'profile_views_v1';
-    const BASE = 512;
-    let n = parseInt(localStorage.getItem(KEY) || '0', 10);
-    if (!localStorage.getItem(KEY)) n = BASE;
-    n += 1;
-    localStorage.setItem(KEY, n);
-    document.getElementById('viewCount').textContent = n.toLocaleString('vi-VN');
-  })();
-
-
-  /* ════════════════════════════════════════════════════════
-     2. MUSIC PLAYER
-  ════════════════════════════════════════════════════════ */
-  const audio     = document.getElementById('music');
-  const albumArt  = document.getElementById('albumArt');
-  const playBtn   = document.getElementById('playBtn');
-  const playIcon  = document.getElementById('playIcon');
-  const muteBtn   = document.getElementById('muteBtn');
-  const volIcon   = document.getElementById('volIcon');
-  const volSlider = document.getElementById('volSlider');
-  const pFill     = document.getElementById('pFill');
-  const pTrack    = document.getElementById('pTrack');
-  const tCur      = document.getElementById('tCur');
-  const tTot      = document.getElementById('tTot');
-
-  let playing = false;
-  audio.volume = 0.8;
-
-  function fmt(s) {
-    if (!s || isNaN(s)) return '0:00';
-    return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
-  }
-
-  function setPlaying(v) {
-    playing = v;
-    playIcon.className = v ? 'fas fa-pause' : 'fas fa-play';
-    albumArt.classList.toggle('playing', v);
-    albumArt.classList.toggle('paused', !v);
-  }
-
-  /* Play / Pause */
-  playBtn.addEventListener('click', () => {
-    playing
-      ? (audio.pause(), setPlaying(false))
-      : audio.play().then(() => setPlaying(true)).catch(() => {});
-  });
-
-  /* Mute toggle */
-  muteBtn.addEventListener('click', () => {
-    audio.muted = !audio.muted;
-    updateVolIcon();
-  });
-
-  /* Volume slider
-     FIX: input + change đã đủ; thêm touchend để đảm bảo mobile cập nhật */
-  function onVolChange() {
-    audio.volume = volSlider.value / 100;
-    audio.muted  = false;
-    updateVolIcon();
-  }
-  volSlider.addEventListener('input',    onVolChange);
-  volSlider.addEventListener('change',   onVolChange);
-  volSlider.addEventListener('touchend', onVolChange, { passive: true });
-
-  /* FIX: chặn touch trên volSlider không lan sang progress-track seek handler */
-  volSlider.addEventListener('touchstart', e => e.stopPropagation(), { passive: true });
-  volSlider.addEventListener('touchmove',  e => e.stopPropagation(), { passive: true });
-
-  function updateVolIcon() {
-    const v = audio.muted ? 0 : volSlider.value / 100;
-    volIcon.className = v === 0  ? 'fas fa-volume-xmark'
-                      : v < 0.4 ? 'fas fa-volume-low'
-                                : 'fas fa-volume-high';
-  }
-
-  /* Progress bar */
-  audio.addEventListener('timeupdate', () => {
-    if (!audio.duration) return;
-    const pct = (audio.currentTime / audio.duration) * 100;
-    pFill.style.width = pct + '%';
-    tCur.textContent  = fmt(audio.currentTime);
-  });
-
-  audio.addEventListener('loadedmetadata', () => {
-    tTot.textContent = fmt(audio.duration);
-  });
-
-  /* ── Seek ── */
-  let seeking = false;
-
-  function seekTo(clientX) {
-    if (!audio.duration) return;
-    const r   = pTrack.getBoundingClientRect();
-    const pct = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
-    audio.currentTime = pct * audio.duration;
-    pFill.style.width = (pct * 100) + '%';
-    tCur.textContent  = fmt(audio.currentTime);
-  }
-
-  function startSeek(clientX) {
-    seeking = true;
-    pTrack.classList.add('dragging');
-    audio.muted = true;
-    seekTo(clientX);
-  }
-
-  function endSeek() {
-    if (!seeking) return;
-    seeking = false;
-    pTrack.classList.remove('dragging');
-    audio.muted = false;
-    updateVolIcon();
-  }
-
-  /* Mouse */
-  pTrack.addEventListener('mousedown', e => startSeek(e.clientX));
-  document.addEventListener('mousemove', e => { if (seeking) seekTo(e.clientX); });
-  document.addEventListener('mouseup',   () => endSeek());
-
-  /* Touch — seek trên progress track */
-  pTrack.addEventListener('touchstart', e => {
-    startSeek(e.touches[0].clientX);
-    e.stopPropagation(); // không cho social-hover handler nhận event này
-    e.preventDefault();
-  }, { passive: false });
-
-  /* Một document touchmove handler duy nhất: seek OR social-hover tracking */
-  document.addEventListener('touchmove', e => {
-    if (seeking) {
-      seekTo(e.touches[0].clientX);
-      e.preventDefault();  // chặn scroll khi đang kéo thanh nhạc
-      return;
+    function setPlaying(v) {
+      playing = v;
+      playIcon.className = v ? 'fas fa-pause' : 'fas fa-play';
+      albumArt.classList.toggle('playing', v);
+      albumArt.classList.toggle('paused', !v);
     }
-    /* Social hover tracking */
-    const btn = getBtnAtPoint(e.touches[0].clientX, e.touches[0].clientY);
-    if (btn !== lastHovered) {
-      clearHover();
-      if (btn) { btn.classList.add('touch-hover'); lastHovered = btn; playTick(); }
+
+    function updateVolIcon() {
+      const v = audio.muted ? 0 : volSlider.value / 100;
+      volIcon.className = v === 0  ? 'fas fa-volume-xmark'
+                        : v < 0.4  ? 'fas fa-volume-low'
+                                   : 'fas fa-volume-high';
     }
-  }, { passive: false });
 
-  /* Kết thúc touch: reset cả seek lẫn hover */
-  function onDocTouchEnd() {
-    endSeek();
-    setTimeout(clearHover, 120); // delay nhỏ để click của <a> kịp fire
-  }
-  document.addEventListener('touchend',    onDocTouchEnd, { passive: true });
-  document.addEventListener('touchcancel', () => { endSeek(); clearHover(); }, { passive: true });
+    function setVol(v) {
+      v = Math.round(Math.max(0, Math.min(100, v)));
+      volSlider.value = v;
+      audio.volume    = v / 100;
+      audio.muted     = false;
+      updateVolIcon();
+    }
 
+    playBtn.addEventListener('click', () => {
+      playing
+        ? (audio.pause(), setPlaying(false))
+        : audio.play().then(() => setPlaying(true)).catch(() => {});
+    });
 
-  /* ════════════════════════════════════════════════════════
-     3. SPLASH SCREEN
-  ════════════════════════════════════════════════════════ */
-  const splash = document.getElementById('splash');
-  let splashDone = false;
+    muteBtn.addEventListener('click', () => {
+      audio.muted = !audio.muted;
+      updateVolIcon();
+    });
 
-  function enterSite() {
-    if (splashDone) return;
-    splashDone = true;
-    splash.classList.add('hide');
-    setTimeout(() => splash.remove(), 1050);
-    audio.play().then(() => setPlaying(true)).catch(() => {});
-  }
+    volSlider.addEventListener('input', () => setVol(+volSlider.value));
 
-  /* Desktop */
-  splash.addEventListener('click', enterSite);
+    function volFromTouch(touch) {
+      const r = volSlider.getBoundingClientRect();
+      setVol(((touch.clientX - r.left) / r.width) * 100);
+    }
 
-  /* Mobile: touchend + preventDefault để block click giả 300ms */
-  splash.addEventListener('touchend', e => {
-    e.preventDefault();
-    enterSite();
-  }, { passive: false });
-
-  splash.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ') enterSite();
-  });
-
-
-  /* ════════════════════════════════════════════════════════
-     4. SOCIAL ICON — TICK SOUND + TOUCH HOVER
-  ════════════════════════════════════════════════════════ */
-  const AudioCtx = window.AudioContext || window.webkitAudioContext;
-  let tickCtx = null;
-
-  function playTick() {
-    try {
-      if (!AudioCtx) return;
-      if (!tickCtx) tickCtx = new AudioCtx();
-      if (tickCtx.state === 'suspended') tickCtx.resume();
-      const osc  = tickCtx.createOscillator();
-      const gain = tickCtx.createGain();
-      osc.connect(gain);
-      gain.connect(tickCtx.destination);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(1600, tickCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(800, tickCtx.currentTime + 0.05);
-      gain.gain.setValueAtTime(0.17, tickCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, tickCtx.currentTime + 0.08);
-      osc.start(tickCtx.currentTime);
-      osc.stop(tickCtx.currentTime + 0.09);
-    } catch (_) {}
-  }
-
-  const socialBtns = document.querySelectorAll('.social-btn');
-  let lastHovered = null;
-
-  function clearHover() {
-    if (lastHovered) { lastHovered.classList.remove('touch-hover'); lastHovered = null; }
-  }
-
-  function getBtnAtPoint(x, y) {
-    const el = document.elementFromPoint(x, y);
-    return el ? el.closest('.social-btn') : null;
-  }
-
-  /* Desktop hover tick — điều hướng do trình duyệt xử lý qua href */
-  socialBtns.forEach(btn => btn.addEventListener('mouseenter', playTick));
-
-  /* Mobile touch: phát tick + hiệu ứng hover
-     passive:true → KHÔNG preventDefault → trình duyệt xử lý href bình thường */
-  socialBtns.forEach(btn => {
-    btn.addEventListener('touchstart', () => {
-      clearHover();
-      btn.classList.add('touch-hover');
-      lastHovered = btn;
-      playTick();
+    volSlider.addEventListener('touchstart', e => {
+      e.stopPropagation();
+      volFromTouch(e.touches[0]);
     }, { passive: true });
-  });
+
+    volSlider.addEventListener('touchmove', e => {
+      e.stopPropagation();
+      volFromTouch(e.touches[0]);
+    }, { passive: true });
+
+    audio.addEventListener('timeupdate', () => {
+      if (!audio.duration) return;
+      pFill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+      tCur.textContent  = fmt(audio.currentTime);
+    });
+
+    audio.addEventListener('loadedmetadata', () => {
+      tTot.textContent = fmt(audio.duration);
+    });
+
+    let seeking = false;
+
+    function seekTo(x) {
+      if (!audio.duration) return;
+      const r   = pTrack.getBoundingClientRect();
+      const pct = Math.max(0, Math.min(1, (x - r.left) / r.width));
+      audio.currentTime = pct * audio.duration;
+      pFill.style.width = (pct * 100) + '%';
+      tCur.textContent  = fmt(audio.currentTime);
+    }
+
+    function startSeek(x) {
+      seeking = true;
+      pTrack.classList.add('dragging');
+      pTrack.classList.remove('hover');
+      audio.muted = true;
+      seekTo(x);
+    }
+
+    function endSeek() {
+      if (!seeking) return;
+      seeking = false;
+      pTrack.classList.remove('dragging');
+      audio.muted = false;
+      updateVolIcon();
+    }
+
+    pTrack.addEventListener('mouseenter', () => pTrack.classList.add('hover'));
+    pTrack.addEventListener('mouseleave', () => pTrack.classList.remove('hover'));
+    pTrack.addEventListener('mousedown',  e => startSeek(e.clientX));
+
+    document.addEventListener('mousemove', e => { if (seeking) seekTo(e.clientX); });
+    document.addEventListener('mouseup',   () => {
+      endSeek();
+      if (pTrack.matches(':hover')) pTrack.classList.add('hover');
+    });
+
+    pTrack.addEventListener('touchstart', e => {
+      e.stopPropagation();
+      e.preventDefault();
+      startSeek(e.touches[0].clientX);
+    }, { passive: false });
+
+    document.addEventListener('touchmove', e => {
+      if (seeking) {
+        e.preventDefault();
+        seekTo(e.touches[0].clientX);
+        return;
+      }
+      const btn = getBtnAtPoint(e.touches[0].clientX, e.touches[0].clientY);
+      if (btn !== lastHovered) {
+        clearHover();
+        if (btn) { btn.classList.add('touch-hover'); lastHovered = btn; playTick(); }
+      }
+    }, { passive: false });
+
+    document.addEventListener('touchend',    () => { endSeek(); setTimeout(clearHover, 120); }, { passive: true });
+    document.addEventListener('touchcancel', () => { endSeek(); clearHover(); }, { passive: true });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) { audio.pause(); setPlaying(false); }
+    });
+    window.addEventListener('pagehide', () => { audio.pause(); setPlaying(false); });
+
+    const splash    = document.getElementById('splash');
+    let splashDone  = false;
+
+    function enterSite() {
+      if (splashDone) return;
+      splashDone = true;
+      splash.classList.add('hide');
+      setTimeout(() => splash.remove(), 1050);
+      audio.play().then(() => setPlaying(true)).catch(() => {});
+    }
+
+    splash.addEventListener('click',   enterSite);
+    splash.addEventListener('touchend', e => { e.preventDefault(); enterSite(); }, { passive: false });
+    splash.addEventListener('keydown',  e => { if (e.key === 'Enter' || e.key === ' ') enterSite(); });
+
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let tickCtx  = null;
+    let lastTickEl = null;
+    let tickTimer  = null;
+
+    function playTick() {
+      try {
+        if (!AudioCtx) return;
+        if (!tickCtx) tickCtx = new AudioCtx();
+        if (tickCtx.state === 'suspended') tickCtx.resume();
+        const osc  = tickCtx.createOscillator();
+        const gain = tickCtx.createGain();
+        osc.connect(gain);
+        gain.connect(tickCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1600, tickCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800, tickCtx.currentTime + 0.05);
+        gain.gain.setValueAtTime(0.17, tickCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, tickCtx.currentTime + 0.08);
+        osc.start(tickCtx.currentTime);
+        osc.stop(tickCtx.currentTime + 0.09);
+      } catch (_) {}
+    }
+
+    function playTickOnce(el) {
+      if (el === lastTickEl) return;
+      lastTickEl = el;
+      clearTimeout(tickTimer);
+      tickTimer = setTimeout(() => { lastTickEl = null; }, 300);
+      playTick();
+    }
+
+    const socialBtns = document.querySelectorAll('.social-btn');
+    let lastHovered  = null;
+
+    function clearHover() {
+      if (lastHovered) { lastHovered.classList.remove('touch-hover'); lastHovered = null; }
+    }
+
+    function getBtnAtPoint(x, y) {
+      const el = document.elementFromPoint(x, y);
+      return el ? el.closest('.social-btn') : null;
+    }
+
+    socialBtns.forEach(btn => {
+      btn.addEventListener('mouseenter', () => playTickOnce(btn));
+
+      btn.addEventListener('click', e => {
+        e.preventDefault();
+        window.open(btn.href, '_blank', 'noopener,noreferrer');
+      });
+
+      btn.addEventListener('touchstart', () => {
+        clearHover();
+        btn.classList.add('touch-hover');
+        lastHovered = btn;
+        playTickOnce(btn);
+      }, { passive: true });
+    });
   </script>
 </body>
 </html>
