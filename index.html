@@ -62,7 +62,7 @@
       gap: 13px;
       width: 100%;
       max-width: 430px;
-      padding: 20px 16px;
+      padding: 20px 16px 72px;
     }
 
     .glass {
@@ -431,6 +431,68 @@
       text-transform: uppercase;
       color: rgba(255,255,255,0.45);
     }
+
+    /* ── Bottom drawer ── */
+    .bottom-drawer {
+      position: fixed;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 430px;
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .drawer-handle {
+      position: relative;
+      width: 44px;
+      height: 5px;
+      background: rgba(255,255,255,0.52);
+      border-radius: 99px;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-bottom: 0;
+      transition:
+        width 0.75s cubic-bezier(0.4,0,0.2,1),
+        height 0.75s cubic-bezier(0.4,0,0.2,1),
+        margin-bottom 0.75s cubic-bezier(0.4,0,0.2,1),
+        background 0.25s ease;
+    }
+
+    /* Expanded hit-area so the thin line stays easy to tap */
+    .drawer-handle::before {
+      content: '';
+      position: absolute;
+      inset: -12px 0;
+    }
+
+    @media (hover: hover) {
+      .drawer-handle:hover {
+        background: rgba(255,255,255,0.78);
+      }
+    }
+
+    .drawer-handle.open {
+      width: 33.33%;
+      height: 2px;
+      margin-bottom: 13px;
+      background: rgba(255,255,255,0.30);
+    }
+
+    .music-wrapper {
+      width: 100%;
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition:
+        max-height 0.75s cubic-bezier(0.4,0,0.2,1),
+        opacity 0.55s ease;
+    }
   </style>
 </head>
 <body>
@@ -481,31 +543,37 @@
       </div>
     </div>
 
-    <div class="glass music-player">
-      <div class="player-top">
-        <img class="album-art" id="albumArt" src="album.png" alt="album" draggable="false">
-        <div class="song-info">
-          <div class="song-title">tosop - ft. vnesee</div>
-          <div class="song-artist">glass animal</div>
-        </div>
-        <div class="controls">
-          <div class="vol-wrap">
-            <button class="ctrl" id="muteBtn"><i class="fas fa-volume-high" id="volIcon"></i></button>
-            <input type="range" id="volSlider" min="0" max="100" value="80">
+  </main>
+
+  <!-- Bottom drawer: handle + hidden music player -->
+  <div class="bottom-drawer" id="bottomDrawer">
+    <div class="drawer-handle" id="drawerHandle"></div>
+    <div class="music-wrapper" id="musicWrapper">
+      <div class="glass music-player">
+        <div class="player-top">
+          <img class="album-art" id="albumArt" src="album.png" alt="album" draggable="false">
+          <div class="song-info">
+            <div class="song-title">tosop - ft. vnesee</div>
+            <div class="song-artist">glass animal</div>
           </div>
-          <button class="ctrl" id="playBtn"><i class="fas fa-play" id="playIcon"></i></button>
+          <div class="controls">
+            <div class="vol-wrap">
+              <button class="ctrl" id="muteBtn"><i class="fas fa-volume-high" id="volIcon"></i></button>
+              <input type="range" id="volSlider" min="0" max="100" value="80">
+            </div>
+            <button class="ctrl" id="playBtn"><i class="fas fa-play" id="playIcon"></i></button>
+          </div>
         </div>
-      </div>
-      <div class="progress-row">
-        <span class="ts" id="tCur">0:00</span>
-        <div class="progress-track" id="pTrack">
-          <div class="progress-fill" id="pFill"></div>
+        <div class="progress-row">
+          <span class="ts" id="tCur">0:00</span>
+          <div class="progress-track" id="pTrack">
+            <div class="progress-fill" id="pFill"></div>
+          </div>
+          <span class="ts end" id="tTot">5:20</span>
         </div>
-        <span class="ts end" id="tTot">5:20</span>
       </div>
     </div>
-
-  </main>
+  </div>
 
   <script>
     document.addEventListener('contextmenu', e => e.preventDefault());
@@ -669,10 +737,9 @@
     document.addEventListener('touchend',    () => { endSeek(); setTimeout(clearHover, 120); }, { passive: true });
     document.addEventListener('touchcancel', () => { endSeek(); clearHover(); }, { passive: true });
 
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) { audio.pause(); setPlaying(false); }
-    });
-    window.addEventListener('pagehide', () => { audio.pause(); setPlaying(false); });
+    // Nhạc nền tiếp tục phát khi chuyển tab / tắt màn hình,
+    // chỉ dừng khi trang thực sự bị đóng / unload.
+    window.addEventListener('beforeunload', () => { audio.pause(); });
 
     const splash    = document.getElementById('splash');
     let splashDone  = false;
@@ -748,6 +815,49 @@
         playTickOnce(btn);
       }, { passive: true });
     });
+
+    /* ── Drawer logic ── */
+    const drawerHandle  = document.getElementById('drawerHandle');
+    const musicWrapper  = document.getElementById('musicWrapper');
+    let   drawerOpen    = false;
+    const EASE          = 'cubic-bezier(0.4,0,0.2,1)';
+    const TRANS_MAIN    = `max-height 0.75s ${EASE}, opacity 0.55s ease`;
+
+    function openDrawer() {
+      drawerOpen = true;
+      // scrollHeight gives actual content height even when max-height is 0
+      const h = musicWrapper.scrollHeight;
+      musicWrapper.style.transition = TRANS_MAIN;
+      musicWrapper.style.maxHeight  = h + 'px';
+      musicWrapper.style.opacity    = '1';
+      musicWrapper.style.pointerEvents = 'auto';
+      drawerHandle.classList.add('open');
+    }
+
+    function closeDrawer() {
+      drawerOpen = false;
+      // Pin max-height to actual rendered height first (no transition),
+      // so the collapse starts from the real size — no dead-time delay.
+      const h = musicWrapper.scrollHeight;
+      musicWrapper.style.transition = 'none';
+      musicWrapper.style.maxHeight  = h + 'px';
+      void musicWrapper.offsetHeight; // force reflow
+      musicWrapper.style.transition    = TRANS_MAIN;
+      musicWrapper.style.maxHeight     = '0';
+      musicWrapper.style.opacity       = '0';
+      musicWrapper.style.pointerEvents = 'none';
+      drawerHandle.classList.remove('open');
+    }
+
+    function toggleDrawer() {
+      drawerOpen ? closeDrawer() : openDrawer();
+    }
+
+    drawerHandle.addEventListener('click', toggleDrawer);
+    drawerHandle.addEventListener('touchend', e => {
+      e.preventDefault();
+      toggleDrawer();
+    }, { passive: false });
   </script>
 </body>
 </html>
