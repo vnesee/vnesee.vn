@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ✏️ Thay đổi tiêu đề tab trình duyệt -->
+  <title>Phong Phu — Profile</title>
+
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    /* ════════════════════════════════════════════
+       RESET & BASE
+    ════════════════════════════════════════════ */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      overflow: hidden;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+
+    /* ════════════════════════════════════════════
+       BACKGROUND GIF
+       Tổng cắt: trên 4px · dưới 32px · trái 32px · phải 32px
+       ┌─ CÁCH TỰ CHỈNH ──────────────────────────┐
+       │  top:    -Xpx        → cắt X px trên      │
+       │  left:   -Xpx        → cắt X px trái      │
+       │  width:  calc(100% + TRÁI + PHẢI)          │
+       │  height: calc(100% + TRÊN + DƯỚI)          │
+       └───────────────────────────────────────────┘
+    ════════════════════════════════════════════ */
+    .bg-wrap {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    #bg {
+      position: absolute;
+      top: -4px;                       /* cắt 4px trên cùng             */
+      left: -40px;                     /* cắt 32px bên trái             */
+      width: calc(100% + 80px);        /* 32px trái + 32px phải = 64px  */
+      height: calc(100% + 45px);       /* 4px trên + 32px dưới = 36px   */
+      object-fit: cover;
+      object-position: left top;
+      pointer-events: none;
+    }
+
+    /* Lớp tối nhẹ lên nền để chữ dễ đọc hơn */
+    .bg-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.22);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ════════════════════════════════════════════
+       LAYOUT WRAPPER
+    ════════════════════════════════════════════ */
+    .page {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 13px;
+      width: 100%;
+      max-width: 430px;
+      padding: 20px 16px;
+    }
+
+    /* ════════════════════════════════════════════
+       GLASS MIXIN  (dùng chung cho 2 card)
+    ════════════════════════════════════════════ */
+    .glass {
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(16px) saturate(1.3);
+      -webkit-backdrop-filter: blur(16px) saturate(1.3);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 22px;
+    }
+
+    /* ════════════════════════════════════════════
+       PROFILE CARD
+    ════════════════════════════════════════════ */
+    .profile-card {
+      width: 100%;
+      padding: 22px 22px 20px;
+      position: relative;
+    }
+
+    /* ── View Counter ── */
+    .view-counter {
+      position: absolute;
+      top: 15px;
+      right: 16px;
+      background: rgba(255, 255, 255, 0.09);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 99px;
+      padding: 4px 12px 4px 9px;
+      font-size: 11.5px;
+      color: rgba(255, 255, 255, 0.7);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      letter-spacing: 0.2px;
+    }
+    .view-counter i { font-size: 10.5px; opacity: 0.8; }
+
+    /* ── Header row: avatar + info ── */
+    .profile-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+      margin-bottom: 14px;
+      padding-right: 72px; /* space for view counter */
+    }
+
+    .avatar-wrap { flex-shrink: 0; }
+
+    .avatar {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2.5px solid rgba(255, 255, 255, 0.32);
+      display: block;
+    }
+
+    .profile-meta { padding-top: 3px; }
+
+    .profile-name {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: 0.15px;
+    }
+
+    .profile-tag {
+      font-size: 12.5px;
+      color: rgba(255, 255, 255, 0.55);
+      margin-top: 4px;
+    }
+
+    .profile-location {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12.5px;
+      color: rgba(255, 255, 255, 0.55);
+      margin-top: 5px;
+    }
+    .profile-location i { font-size: 10px; }
+
+    /* ── Divider ── */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+      margin: 12px 0;
+    }
+
+    /* ── Bio ── */
+    .profile-bio {
+      font-size: 13.5px;
+      color: rgba(255, 255, 255, 0.70);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    /* ── Social Icons ── */
+    .social-row {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    .social-btn {
+      width: 37px;
+      height: 37px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.09);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 15px;
+      text-decoration: none;
+      cursor: pointer;
+      user-select: none;
+      /* bounce spring easing */
+      transition:
+        transform   0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+        background  0.2s ease,
+        color       0.2s ease,
+        box-shadow  0.2s ease;
+    }
+
+    .social-btn:hover {
+      transform: translateY(-6px) scale(1.14);
+      background: rgba(255, 255, 255, 0.20);
+      color: #fff;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    }
+
+    .social-btn:active {
+      transform: translateY(-2px) scale(1.04);
+      transition-duration: 0.1s;
+    }
+
+    /* ════════════════════════════════════════════
+       MUSIC PLAYER
+    ════════════════════════════════════════════ */
+    .music-player {
+      width: 100%;
+      padding: 14px 16px 13px;
+    }
+
+    /* Spinning record animation */
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    /* Top row: album art + song info + controls */
+    .player-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .album-art {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.26);
+      flex-shrink: 0;
+    }
+    .album-art.playing {
+      animation: spin 5s linear infinite;
+    }
+
+    .song-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .song-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .song-artist {
+      font-size: 11.5px;
+      color: rgba(255, 255, 255, 0.52);
+      margin-top: 2px;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .ctrl {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 17px;
+      cursor: pointer;
+      padding: 4px 5px;
+      line-height: 1;
+      transition: transform 0.15s, color 0.15s;
+    }
+    .ctrl:hover  { color: #fff; transform: scale(1.18); }
+    .ctrl:active { transform: scale(0.92); }
+
+    /* Volume */
+    .vol-wrap {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Custom range input */
+    input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255, 255, 255, 0.22);
+      border-radius: 99px;
+      height: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #fff;
+      cursor: pointer;
+      box-shadow: 0 0 4px rgba(0,0,0,0.3);
+      transition: transform 0.15s;
+    }
+    input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.3); }
+    input[type=range]::-moz-range-thumb {
+      width: 11px;
+      height: 11px;
+      border: none;
+      border-radius: 50%;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    #volSlider { width: 56px; }
+
+    /* Progress row */
+    .progress-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 9px;
+    }
+
+    .ts {
+      font-size: 10.5px;
+      color: rgba(255, 255, 255, 0.52);
+      min-width: 30px;
+      font-variant-numeric: tabular-nums;
+    }
+    .ts.end { text-align: right; }
+
+    .progress-track {
+      flex: 1;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 99px;
+      cursor: pointer;
+      position: relative;
+    }
+    .progress-track:hover { transform: scaleY(1.6); transition: transform 0.15s; }
+
+    .progress-fill {
+      height: 100%;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 99px;
+      width: 0%;
+      position: relative;
+      pointer-events: none;
+      transition: width 0.4s linear;
+    }
+    /* Scrubber dot */
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      right: -4px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 5px rgba(0,0,0,0.4);
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .progress-track:hover .progress-fill::after { opacity: 1; }
+
+    /* ════════════════════════════════════════════
+       SPLASH SCREEN
+    ════════════════════════════════════════════ */
+    #splash {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: opacity 1s ease;
+    }
+
+    #splash.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* "Halo" — thở rất nhẹ: gần như không thay đổi, chỉ opacity nhích nhẹ */
+    @keyframes halo-breathe {
+      0%, 100% {
+        opacity: 0.58;
+        filter: blur(1.2px);
+        transform: scale(0.978);
+      }
+      50% {
+        opacity: 1;
+        filter: blur(0px);
+        transform: scale(1);
+      }
+    }
+
+    .splash-title {
+      font-size: 38px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #fff;
+      animation: halo-breathe 3.8s ease-in-out infinite;
+    }
+
+    /* "TAP TO ENTER" — tĩnh, không nhấp nháy */
+    .splash-sub {
+      margin-top: 16px;
+      font-size: 10.5px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════
+       SPLASH SCREEN  (click để vào trang)
+       ✏️ Đổi chữ "Halo" bên dưới nếu muốn
+  ══════════════════════════════════════════ -->
+  <div id="splash">
+    <div class="splash-title">Halo</div>
+    <div class="splash-sub">Tap to enter</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       BACKGROUND
+       ✏️ Đổi "bg.gif" thành tên file GIF của bạn
+  ══════════════════════════════════════════ -->
+  <div class="bg-wrap">
+    <img id="bg" src="bg.gif" alt="">
+  </div>
+  <div class="bg-overlay"></div>
+
+  <!-- Nhạc nền — ✏️ Đổi "music.mp3" thành tên file nhạc của bạn -->
+  <audio id="music" loop preload="auto">
+    <source src="music.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- ══════════════════════════════════════════
+       CONTENT
+  ══════════════════════════════════════════ -->
+  <main class="page">
+
+    <!-- ────── Profile Card ────── -->
+    <div class="glass profile-card">
+
+      <!-- Bộ đếm lượt xem -->
+      <div class="view-counter">
+        <i class="fas fa-eye"></i>
+        <span id="viewCount">512</span>
+      </div>
+
+      <!-- Header: avatar + tên + tag + vị trí -->
+      <div class="profile-header">
+        <div class="avatar-wrap">
+          <!-- ✏️ Đổi "avatar.png" thành ảnh avatar của bạn -->
+          <img class="avatar" src="avatar.png" alt="avatar">
+        </div>
+        <div class="profile-meta">
+          <!-- ✏️ Tên của bạn -->
+          <div class="profile-name">Phong Phu</div>
+          <!-- ✏️ Username / tag -->
+          <div class="profile-tag">@vnesee</div>
+          <!-- ✏️ Vị trí sinh sống -->
+          <div class="profile-location">
+            <i class="fas fa-location-dot"></i>
+            Da Lat - Lam Dong
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- ✏️ Câu giới thiệu tùy chỉnh -->
+      <div class="profile-bio">
+        Nothin' to see here
+      </div>
+
+      <!-- Social icons — ✏️ Thay href bằng link của bạn, xóa hoặc thêm icon tùy ý -->
+      <div class="social-row">
+
+        <a class="social-btn" href="https://github.com/vnesee" target="_blank" rel="noopener" title="GitHub">
+          <i class="fab fa-github"></i>
+        </a>
+
+        <a class="social-btn" href="https://facebook.com/quachphongphu2009" target="_blank" rel="noopener" title="Facebook">
+          <i class="fab fa-facebook-f"></i>
+        </a>
+
+        <a class="social-btn" href="https://tiktok.com/@_di4c" target="_blank" rel="noopener" title="TikTok">
+          <i class="fab fa-tiktok"></i>
+        </a>
+
+        <a class="social-btn" href="https://instagram.com/rpt.mckeyyyyy" target="_blank" rel="noopener" title="Instagram">
+          <i class="fab fa-instagram"></i>
+        </a>
+
+        <a class="social-btn" href="https://discord.gg/invite/vnpvp-asia-trai-khi-1061493608571736074" target="_blank" rel="noopener" title="Discord">
+          <i class="fab fa-discord"></i>
+        </a>
+
+        <a class="social-btn" href="https://open.spotify.com/artist/5dfZ5uSmzR7VQK0udbAVpf" target="_blank" rel="noopener" title="Spotify">
+          <i class="fab fa-spotify"></i>
+        </a>
+
+      </div>
+    </div><!-- /profile-card -->
+
+    <!-- ────── Music Player ────── -->
+    <div class="glass music-player">
+
+      <div class="player-top">
+        <!-- Album art xoay khi phát — ✏️ Đặt ảnh bìa bài hát tên "album.png" vào cùng thư mục -->
+        <img class="album-art" id="albumArt" src="album.png" alt="album">
+
+        <div class="song-info">
+          <!-- ✏️ Tên bài hát -->
+          <div class="song-title">nuts - ft. vnesee</div>
+          <!-- ✏️ Tên nghệ sĩ / tác giả -->
+          <div class="song-artist">lil peep</div>
+        </div>
+
+        <div class="controls">
+          <div class="vol-wrap">
+            <button class="ctrl" id="muteBtn" title="Tắt / Bật tiếng">
+              <i class="fas fa-volume-high" id="volIcon"></i>
+            </button>
+            <input type="range" id="volSlider" min="0" max="100" value="80">
+          </div>
+          <button class="ctrl" id="playBtn" title="Phát / Dừng">
+            <i class="fas fa-play" id="playIcon"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Thanh tiến trình -->
+      <div class="progress-row">
+        <span class="ts"      id="tCur">0:00</span>
+        <div class="progress-track" id="pTrack">
+          <div class="progress-fill" id="pFill"></div>
+        </div>
+        <span class="ts end"  id="tTot">1:19</span>
+      </div>
+
+    </div><!-- /music-player -->
+
+  </main>
+
+  <!-- ══════════════════════════════════════════
+       JAVASCRIPT
+  ══════════════════════════════════════════ -->
+  <script>
+  /* ────────────────────────────────────────
+     1.  VIEW COUNTER  (localStorage, base 512)
+  ──────────────────────────────────────── */
+  (function () {
+    const KEY  = 'profile_views_v1';
+    const BASE = 512; // ✏️ Số lượt mặc định ban đầu
+    let   n    = parseInt(localStorage.getItem(KEY) || '0', 10);
+
+    /* Nếu chưa có bản ghi, bắt đầu từ BASE */
+    if (!localStorage.getItem(KEY)) n = BASE;
+    n += 1;
+    localStorage.setItem(KEY, n);
+    document.getElementById('viewCount').textContent = n.toLocaleString('vi-VN');
+  })();
+
+
+  /* ────────────────────────────────────────
+     2.  MUSIC PLAYER
+  ──────────────────────────────────────── */
+  const audio     = document.getElementById('music');
+  const albumArt  = document.getElementById('albumArt');
+  const playBtn   = document.getElementById('playBtn');
+  const playIcon  = document.getElementById('playIcon');
+  const muteBtn   = document.getElementById('muteBtn');
+  const volIcon   = document.getElementById('volIcon');
+  const volSlider = document.getElementById('volSlider');
+  const pFill     = document.getElementById('pFill');
+  const pTrack    = document.getElementById('pTrack');
+  const tCur      = document.getElementById('tCur');
+  const tTot      = document.getElementById('tTot');
+
+  let playing = false;
+
+  audio.volume = 0.8;
+
+  /* Format seconds → m:ss */
+  function fmt(s) {
+    if (!s || isNaN(s)) return '0:00';
+    return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+  }
+
+  function setPlaying(v) {
+    playing = v;
+    playIcon.className = v ? 'fas fa-pause' : 'fas fa-play';
+    v ? albumArt.classList.add('playing') : albumArt.classList.remove('playing');
+  }
+
+  /* Play / Pause */
+  playBtn.addEventListener('click', () => {
+    playing
+      ? (audio.pause(), setPlaying(false))
+      : audio.play().then(() => setPlaying(true)).catch(() => {});
+  });
+
+  /* Mute toggle */
+  muteBtn.addEventListener('click', () => {
+    audio.muted = !audio.muted;
+    updateVolIcon();
+  });
+
+  /* Volume slider */
+  volSlider.addEventListener('input', () => {
+    audio.volume = volSlider.value / 100;
+    audio.muted  = false;
+    updateVolIcon();
+  });
+
+  function updateVolIcon() {
+    const v = audio.muted ? 0 : audio.volume;
+    volIcon.className = v === 0 ? 'fas fa-volume-xmark'
+                      : v < 0.4  ? 'fas fa-volume-low'
+                                 : 'fas fa-volume-high';
+  }
+
+  /* Progress update */
+  audio.addEventListener('timeupdate', () => {
+    if (!audio.duration) return;
+    const pct = (audio.currentTime / audio.duration) * 100;
+    pFill.style.width = pct + '%';
+    tCur.textContent  = fmt(audio.currentTime);
+  });
+
+  audio.addEventListener('loadedmetadata', () => {
+    tTot.textContent = fmt(audio.duration);
+  });
+
+  /* Seek on click */
+  pTrack.addEventListener('click', (e) => {
+    if (!audio.duration) return;
+    const r   = pTrack.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+    audio.currentTime = pct * audio.duration;
+  });
+
+  /* Auto-play chỉ sau khi splash đóng — KHÔNG tự phát khi click splash */
+
+  /* ────────────────────────────────────────
+     4.  SPLASH SCREEN
+  ──────────────────────────────────────── */
+  const splash = document.getElementById('splash');
+
+  function enterSite() {
+    splash.classList.add('hide');
+    setTimeout(() => splash.remove(), 1050);
+    /* Phát nhạc SAU KHI nội dung hiện ra */
+    audio.play().then(() => setPlaying(true)).catch(() => {});
+  }
+
+  splash.addEventListener('click',   enterSite);
+  splash.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') enterSite();
+  });
+
+
+  /* ────────────────────────────────────────
+     3.  SOCIAL ICON  — TIẾNG TÁC KHI HOVER
+     Dùng 1 AudioContext duy nhất để tránh
+     lỗi hết giới hạn khi hover quá nhanh
+  ──────────────────────────────────────── */
+  const tickCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function playTick() {
+    try {
+      if (tickCtx.state === 'suspended') tickCtx.resume();
+      const osc  = tickCtx.createOscillator();
+      const gain = tickCtx.createGain();
+      osc.connect(gain);
+      gain.connect(tickCtx.destination);
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1600, tickCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(800, tickCtx.currentTime + 0.05);
+
+      gain.gain.setValueAtTime(0.17, tickCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, tickCtx.currentTime + 0.08);
+
+      osc.start(tickCtx.currentTime);
+      osc.stop(tickCtx.currentTime + 0.09);
+    } catch (_) {}
+  }
+
+  document.querySelectorAll('.social-btn').forEach(btn => {
+    btn.addEventListener('mouseenter', playTick);
+  });
+  </script>
+</body>
+</html>
