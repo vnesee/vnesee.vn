@@ -523,30 +523,30 @@
         Nothin' to see here
       </div>
 
-      <!-- Social icons — ✏️ Thay href bằng link của bạn, xóa hoặc thêm icon tùy ý -->
+      <!-- Social icons — ✏️ Thay data-href bằng link của bạn, xóa hoặc thêm icon tùy ý -->
       <div class="social-row">
 
-        <a class="social-btn" href="https://github.com/vnesee" target="_blank" rel="noopener" title="GitHub">
+        <a class="social-btn" data-href="https://github.com/vnesee" title="GitHub">
           <i class="fab fa-github"></i>
         </a>
 
-        <a class="social-btn" href="https://facebook.com/quachphongphu2009" target="_blank" rel="noopener" title="Facebook">
+        <a class="social-btn" data-href="https://facebook.com/quachphongphu2009" title="Facebook">
           <i class="fab fa-facebook-f"></i>
         </a>
 
-        <a class="social-btn" href="https://tiktok.com/@_di4c" target="_blank" rel="noopener" title="TikTok">
+        <a class="social-btn" data-href="https://tiktok.com/@_di4c" title="TikTok">
           <i class="fab fa-tiktok"></i>
         </a>
 
-        <a class="social-btn" href="https://instagram.com/rpt.mckeyyyyy" target="_blank" rel="noopener" title="Instagram">
+        <a class="social-btn" data-href="https://instagram.com/rpt.mckeyyyyy" title="Instagram">
           <i class="fab fa-instagram"></i>
         </a>
 
-        <a class="social-btn" href="https://discord.gg/invite/vnpvp-asia-trai-khi-1061493608571736074" target="_blank" rel="noopener" title="Discord">
+        <a class="social-btn" data-href="https://discord.gg/invite/vnpvp-asia-trai-khi-1061493608571736074" title="Discord">
           <i class="fab fa-discord"></i>
         </a>
 
-        <a class="social-btn" href="https://open.spotify.com/artist/5dfZ5uSmzR7VQK0udbAVpf" target="_blank" rel="noopener" title="Spotify">
+        <a class="social-btn" data-href="https://open.spotify.com/artist/5dfZ5uSmzR7VQK0udbAVpf" title="Spotify">
           <i class="fab fa-spotify"></i>
         </a>
 
@@ -785,42 +785,66 @@
 
   const socialBtns = document.querySelectorAll('.social-btn');
 
-  /* Desktop: mouseenter */
+  /* Desktop: mouseenter phát tick, click mở link */
   socialBtns.forEach(btn => {
     btn.addEventListener('mouseenter', playTick);
+    btn.addEventListener('click', () => {
+      const url = btn.dataset.href;
+      if (url) window.open(url, '_blank', 'noopener,noreferrer');
+    });
   });
 
-  /* Mobile: chạm ngón tay vào khoảng trống rồi di qua icon
-     → dùng touch-hover class thay cho :hover                */
+  /* ── Mobile touch hover + mở link ──
+     - touchstart trên icon: thêm hover ngay
+     - touchmove: theo dõi ngón tay di qua icon nào
+     - touchend: xóa hover, nếu ngón tay vẫn trên icon thì mở link  */
   let lastHovered = null;
+  let touchStartBtn = null;
+
+  function clearHover() {
+    if (lastHovered) lastHovered.classList.remove('touch-hover');
+    lastHovered = null;
+  }
 
   function getBtnAtPoint(x, y) {
-    /* Tạm thời ẩn pointer-events để elementFromPoint xuyên qua lớp trên */
     const el = document.elementFromPoint(x, y);
     if (!el) return null;
     return el.closest('.social-btn');
   }
 
+  socialBtns.forEach(btn => {
+    btn.addEventListener('touchstart', (e) => {
+      touchStartBtn = btn;
+      clearHover();
+      btn.classList.add('touch-hover');
+      lastHovered = btn;
+      playTick();
+    }, { passive: true });
+  });
+
   document.addEventListener('touchmove', (e) => {
     const t   = e.touches[0];
     const btn = getBtnAtPoint(t.clientX, t.clientY);
-
     if (btn !== lastHovered) {
-      /* Bỏ hover icon cũ */
-      if (lastHovered) lastHovered.classList.remove('touch-hover');
-      /* Thêm hover icon mới */
+      clearHover();
       if (btn) {
         btn.classList.add('touch-hover');
+        lastHovered = btn;
         playTick();
       }
-      lastHovered = btn;
     }
   }, { passive: true });
 
-  document.addEventListener('touchend', () => {
-    if (lastHovered) lastHovered.classList.remove('touch-hover');
-    lastHovered = null;
-  });
+  document.addEventListener('touchend', (e) => {
+    const t   = e.changedTouches[0];
+    const btn = getBtnAtPoint(t.clientX, t.clientY);
+    clearHover();
+    /* Mở link nếu ngón tay nhấc lên đúng trên icon */
+    if (btn && btn.dataset.href) {
+      window.open(btn.dataset.href, '_blank', 'noopener,noreferrer');
+    }
+    touchStartBtn = null;
+  }, { passive: true });
   </script>
 </body>
 </html>
